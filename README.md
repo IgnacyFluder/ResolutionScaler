@@ -4,7 +4,6 @@
 
 ## Features
 
-- Automatically detects supported tablets using OpenTabletDriver
 - Allows scaling the tablet work area based on screen resolution
 - Useful for artists, designers, and digital note-takers with multi-monitor or high-DPI setups
 - Clean and responsive UI with real-time feedback
