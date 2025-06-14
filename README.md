@@ -1,21 +1,18 @@
-# Tablet Workarea Scaling App
+# Tablet Workarea Scaler
 
-## Description
+**Tablet Workarea Scaler** is a utility designed to dynamically scale and align a graphics tablet's working area with your screen resolution. This app integrates with [OpenTabletDriver](https://github.com/OpenTabletDriver/OpenTabletDriver) to detect supported tablets and adjust mappings in real time, allowing for optimal drawing precision and screen-to-tablet ratio consistency across different monitor setups.
 
-This application allows users to scale their tablet workarea with their screen resolution. It works by leveraging the **openTabletDriver** to ensure compatibility with various tablet models. This application is designed to enhance your workflow by adjusting the tablet's screen area for a more comfortable drawing or working experience.
+## Features
 
-### Features:
-- Supports a wide variety of tablet models.
-- Seamlessly adjusts tablet workarea to match the screen resolution.
-- Simple and easy-to-use interface.
-- Compatible with the openTabletDriver framework.
+- Automatically detects supported tablets using OpenTabletDriver
+- Allows scaling the tablet work area based on screen resolution
+- Useful for artists, designers, and digital note-takers with multi-monitor or high-DPI setups
+- Clean and responsive UI with real-time feedback
 
 ## Supported Tablets
 
-OTD currently supports the following tablets:
-
 <details>
-<summary>Click to expand list</summary>
+<summary>Click to expand the list of supported tablets</summary>
 
 - Acepen AP1060
 - Acepen AP906
@@ -249,4 +246,59 @@ OTD currently supports the following tablets:
 - XENX P1-640
 - XENX P3-1060
 - XENX X1-640
-- XP-Pen Artist
+- XP-Pen Artist 10 (2nd Gen)
+- XP-Pen Artist 10S
+- XP-Pen Artist 12 (2nd Gen)
+- XP-Pen Artist 12 Pro
+- XP-Pen Artist 12
+- XP-Pen Artist 13 (2nd Gen)
+- XP-Pen Artist 13.3 Pro
+- XP-Pen Artist 13.3
+- XP-Pen Artist 15.6 Pro
+- XP-Pen Artist 15.6
+- XP-Pen Artist 16 (2nd Gen)
+- XP-Pen Artist 16 Pro
+- XP-Pen Artist 16
+- XP-Pen Artist 22 (2nd Gen)
+- XP-Pen Artist 22HD
+- XP-Pen Artist 24 Pro
+- XP-Pen Artist 24
+- XP-Pen Artist Pro 16 (Gen2)
+- XP-Pen Artist Pro 16TP
+- XP-Pen CT1060
+- XP-Pen CT430
+- XP-Pen CT640
+- XP-Pen Deco 01 V2 (Variant 2)
+- XP-Pen Deco 01 V2
+- XP-Pen Deco 01 V3
+- XP-Pen Deco 01
+- XP-Pen Deco 02
+- XP-Pen Deco 03
+- XP-Pen Deco L
+- XP-Pen Deco M
+- XP-Pen Deco mini4
+- XP-Pen Deco mini7 V2
+- XP-Pen Deco mini7
+- XP-Pen Deco Pro LW Gen2
+- XP-Pen Deco Pro Medium
+- XP-Pen Deco Pro Small
+- XP-Pen Deco Pro SW
+- XP-Pen Deco Pro XLW Gen2
+- XP-Pen Innovator 16
+- XP-Pen Star 02
+- XP-Pen Star 03 Pro
+- XP-Pen Star 03
+- XP-Pen Star 05 V3
+- XP-Pen Star 06
+- XP-Pen Star 06C
+- XP-Pen Star G430
+- XP-Pen Star G430S V2
+- XP-Pen Star G430S
+- XP-Pen Star G540 Pro
+- XP-Pen Star G540
+- XP-Pen Star G640 (Variant 2)
+- XP-Pen Star G640
+- XP-Pen Star G640S
+- XP-Pen Star G960
+- XP-Pen Star G960S Plus
+- XP-Pen Star G960S
