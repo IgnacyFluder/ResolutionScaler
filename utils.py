@@ -1,24 +1,19 @@
 import ctypes
 from ctypes import wintypes
-import os
 import tkinter as tk
+from tkinter import messagebox
 import requests
 import zipfile
 import shutil
-import os
 import tempfile
 import subprocess
-from tkinter import messagebox
+import os
+
+USER32 = ctypes.windll.user32
 
 def download_otd(destination_folder: str):
-    """
-    Downloads OpenTabletDriver's latest Windows release,
-    renames the daemon to otd.exe, and places it in the destination folder.
-    """
-    # Ensure destination folder exists
     os.makedirs(destination_folder, exist_ok=True)
 
-    # GitHub API for latest release
     url = "https://api.github.com/repos/OpenTabletDriver/OpenTabletDriver/releases/latest"
     headers = {"Accept": "application/vnd.github.v3+json"}
 
@@ -28,7 +23,6 @@ def download_otd(destination_folder: str):
         response.raise_for_status()
         data = response.json()
 
-        # Find the Windows zip asset
         asset = next((a for a in data['assets'] if a['name'].endswith("win-x64.zip")), None)
         if not asset:
             raise Exception("Windows release asset not found.")
@@ -48,40 +42,44 @@ def download_otd(destination_folder: str):
             extract_dir = tempfile.mkdtemp()
             zip_ref.extractall(extract_dir)
 
-        # Look for the daemon and rename it
         daemon_path = None
+        console_path = None
+
         for root, _, files in os.walk(extract_dir):
             for file in files:
-                if file.lower() == "opentabletdriver.daemon.exe":
+                file_lower = file.lower()
+                if file_lower == "opentabletdriver.daemon.exe":
                     daemon_path = os.path.join(root, file)
-                    break
+                elif file_lower == "opentabletdriver.console.exe":
+                    console_path = os.path.join(root, file)
 
         if not daemon_path:
             raise Exception("Daemon executable not found in extracted files.")
+        if not console_path:
+            raise Exception("Console executable not found in extracted files.")
 
-        # Destination path for renamed file
-        dest_path = os.path.join(destination_folder, "otd.exe")
-        shutil.move(daemon_path, dest_path)
+        shutil.move(daemon_path, os.path.join(destination_folder, "otd_daemon.exe"))
+        shutil.move(console_path, os.path.join(destination_folder, "otd.exe"))
 
-        print(f"OpenTabletDriver daemon saved to: {dest_path}")
+        print(f"Daemon saved to: {os.path.join(destination_folder, 'otd_daemon.exe')}")
+        print(f"Console saved to: {os.path.join(destination_folder, 'otd.exe')}")
 
     except Exception as e:
         print(f"Error: {e}")
 
-def is_otd_running(process_name="otd.exe"):
+def is_otd_running(process_name="otd_daemon.exe"):
     try:
         output = subprocess.check_output('tasklist', text=True)
         return process_name.lower() in output.lower()
     except subprocess.CalledProcessError:
         return False
 
-import subprocess
 
 def kill_otd():
     try:
-        subprocess.run(["taskkill", "/f", "/im", "otd.exe"], check=True, capture_output=True)
+        subprocess.run(["taskkill", "/f", "/im", "otd_daemon.exe"], check=True, capture_output=True)
     except subprocess.CalledProcessError as e:
-        messagebox.showerror("Error", f"Failed to terminate otd.exe: {e.stderr.decode()}")
+        messagebox.showerror("Error", f"Failed to terminate otd_daemon.exe: {e.stderr.decode()}")
 
 
 
@@ -102,7 +100,7 @@ def choose_monitor(monitor_resolutions):
 
     win = tk.Toplevel()
     win.title("Select Monitor")
-    win.geometry("300x200")
+    win.geometry("400x300")
     win.grab_set()  # Make the dialog modal
 
     tk.Label(win, text="Select the monitor you want to use:").pack(pady=10)
@@ -163,22 +161,12 @@ class AppData:
             None, "runas", bat_path, None, None, 1
         )
 
-        print("App data deletion initiated with elevated permissions.")
-
-
-    
-
-
-
-USER32 = ctypes.windll.user32
-
 def set_per_monitor_v2_dpi_awareness():
     SetProcessDpiAwarenessContext = USER32.SetProcessDpiAwarenessContext
     SetProcessDpiAwarenessContext.restype = wintypes.BOOL
     SetProcessDpiAwarenessContext.argtypes = [ctypes.c_void_p]
     SetProcessDpiAwarenessContext(ctypes.c_void_p(-4))
 
-# Structures
 class RECT(ctypes.Structure):
     _fields_ = [
         ('left', ctypes.c_long),

@@ -1,14 +1,12 @@
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import messagebox, ttk, Menu, simpledialog
 import json
 import os
 import subprocess
-import re
 import ctypes
 import utils
-from tkinter import Menu
 import webbrowser
-from tkinter import simpledialog
+
 
 utils.set_per_monitor_v2_dpi_awareness()
 
@@ -21,11 +19,11 @@ class ResolutionScaler(tk.Tk):
         # Constants
         self.USER32 = ctypes.windll.user32
         self.SCREEN_SIZE = utils.get_monitor_resolutions()[0][0], utils.get_monitor_resolutions()[0][1]
-        self.OTD_PATH = self.ad.get_app_folder()+"\\otd.exe"
+        self.OTD_PATH = self.ad.get_app_folder()+"\\otd_daemon.exe"
         is_otd_running = utils.is_otd_running()
         self.withdraw()
         if not os.path.exists(self.OTD_PATH) and not is_otd_running:
-            if messagebox.askyesno("Error", "otd.exe not found in app folder nor is it running. Would you like to download it now?"):
+            if messagebox.askyesno("Error", "otd_daemon.exe not found in app folder nor is it running. Would you like to download it now?"):
                 utils.download_otd(self.ad.get_app_folder())
                 messagebox.showinfo("Download complete", "otd will now run in the background.")
                 utils.run_daemon_silently(self.OTD_PATH)
@@ -34,13 +32,13 @@ class ResolutionScaler(tk.Tk):
             else: 
                 self.destroy()
         elif not os.path.exists(self.OTD_PATH) and is_otd_running:
-            if messagebox.askyesno("Info", "otd.exe was found running in the background.\nWe recommend placing the otd.exe file in the app folder for better compatibility.\n\nYou can download it from the GitHub repository."):
-                if messagebox.askokcancel("Warning", "otd.exe will be shutdown, click cancel to keep it running"):
+            if messagebox.askyesno("Info", "otd_daemon.exe was found running in the background.\nWe recommend placing the otd_daemon.exe file in the app folder for better compatibility.\n\nYou can download it from the GitHub repository."):
+                if messagebox.askokcancel("Warning", "otd_daemon.exe will be shutdown, click cancel to keep it running"):
                     utils.kill_otd()
                 else:
                     self.destroy()
                 utils.download_otd(self.ad.get_app_folder())
-                messagebox.showinfo("Download complete", "otd will now run in the background.")
+                messagebox.showinfo("Download complete", "otd.exe and otd_daemon.exe have been downloaded.\notd_daemon.exe will now run in the background.")
                 utils.run_daemon_silently(self.OTD_PATH)
                 self.deiconify()
             else:
@@ -166,7 +164,7 @@ class ResolutionScaler(tk.Tk):
         preset.add_command(label ='Delete preset', command = self.delete_selected_preset)
 
 
-        menubar.add_command(label ='Repo', command = lambda: webbrowser.open(""))
+        menubar.add_command(label ='Repo', command = lambda: webbrowser.open("https://github.com/IgnacyFluder/ResolutionScaler"))
 
         title_label = ttk.Label(self, text="Resolution Scaler", font=("Segoe UI", 16, "bold"))
         title_label.pack(pady=(10, 5))
@@ -245,8 +243,9 @@ class ResolutionScaler(tk.Tk):
             messagebox.showerror("Error", "Invalid scale factor.")
 
     def remove_all_app_data(self):
-        confirm_1 = messagebox.askyesno("Confirm", "Are you sure you want to remove all app data? This will delete all presets and settings.", icon='warning')
-        confirm_2 = messagebox.askyesno("Confirm", "This will also terminate otd.exe if it is running.\nAre you sure you want to continue?", icon='warning')
+        confirm_1 = messagebox.askyesno("Confirm", "Are you sure you want to remove all app data? This will delete all presets and settings. This may require elevating permissions.", icon='warning')
+        confirm_2 = messagebox.askyesno("Confirm", "This will also terminate otd_daemon.exe if it is running.\nAre you sure you want to continue?", icon='warning')
+        
         if confirm_1 and confirm_2:
             utils.kill_otd()
             self.ad.clear_app_data()
@@ -360,17 +359,22 @@ class ResolutionScaler(tk.Tk):
             return
 
         try:
-            # Set the display area to the chosen monitor
             result_1 = subprocess.run(
-                ["otd", "setdisplayarea", self.TABLET_NAME, str(self.TARGET_WIDTH), str(self.TARGET_HEIGHT), str(self.TARGET_POS[0]), str(self.TARGET_POS[1])],
+                [self.ad.get_app_folder() + '\\otd.exe',
+                 "setdisplayarea",
+                 self.TABLET_NAME,
+                 str(self.TARGET_WIDTH),
+                 str(self.TARGET_HEIGHT),
+                 str(self.TARGET_POS[0]),
+                 str(self.TARGET_POS[1])
+                ],
                 capture_output=True, text=True
             )
 
             
-            # Then set the tablet area with your scale-based sizes as before
             pos = self.get_position(height_mm, width_mm)
             result_2 = subprocess.run(
-                ["otd",
+                [self.ad.get_app_folder() + '\\otd.exe',
                  "settabletarea",
                  self.TABLET_NAME,
                  str(width_mm),
@@ -399,15 +403,12 @@ class TabletSettings(tk.Toplevel):
         self.title("Tablet config")
         self.change_string = change_string
 
-        # Display rotation text
         self.rotation_label = tk.Label(self, text=str(self.rotation)+"°", font=("Arial", 24), fg="gold", bg="white")
         self.rotation_label.place(relx=0.5, rely=0.5, anchor="center")
 
-        # Create 4 corner buttons
         self.corners = []
         self.create_corner_buttons()
 
-        # Bind click event to the whole window
         self.bind("<Button-1>", self.handle_click)
 
     def create_corner_buttons(self):
@@ -425,15 +426,12 @@ class TabletSettings(tk.Toplevel):
             self.corners.append(btn)
 
     def handle_click(self, event):
-        # If the clicked widget is one of the corner buttons, do nothing
         if event.widget in self.corners:
             return
 
-        # Rotate by 90°
         self.rotation = (self.rotation + 90) % 360
         self.rotation_label.config(text=f"{self.rotation}°")
 
-        # Update global rotation
         self.master.TABLET_ROTATION = self.rotation
         self.master.update_settings_label()
 
