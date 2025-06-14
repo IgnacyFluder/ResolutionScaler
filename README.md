@@ -13,8 +13,8 @@
 <details>
 <summary>Click to expand the list of supported tablets</summary>
 
-- Acepen AP1060
-- Acepen AP906
+- Acepen AP1060 (254mm / 152mm)
+- Acepen AP906 (230mm / 132mm)
 - Adesso Cybertablet K8
 - Artisul A1201
 - Artisul AP604
@@ -292,7 +292,7 @@
 - XP-Pen Star 06C
 - XP-Pen Star G430
 - XP-Pen Star G430S V2
-- XP-Pen Star G430S
+- XP-Pen Star G430S (101.6mm / 76.2mm)
 - XP-Pen Star G540 Pro
 - XP-Pen Star G540
 - XP-Pen Star G640 (Variant 2)
