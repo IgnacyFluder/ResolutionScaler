@@ -8,6 +8,14 @@
 - Useful for artists, designers, and digital note-takers with multi-monitor or high-DPI setups
 - Clean and responsive UI with real-time feedback
 
+## Run
+With python:
+```
+pip install -r requirements.txt
+python proportion.py
+```
+or use the precompiled pyinstaller exe
+
 ## Supported Tablets
 
 <details>
