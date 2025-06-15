@@ -1,11 +1,11 @@
 # ResolutionScaler
 
 **ResolutionScaler** is a utility designed to dynamically scale and align a graphics tablet's working area with your screen resolution. This app integrates with [OpenTabletDriver](https://github.com/OpenTabletDriver/OpenTabletDriver) to detect supported tablets and adjust mappings in real time, allowing for optimal drawing precision and screen-to-tablet ratio consistency across different monitor setups.
+I made this to play osu but it could be useful for artists maybe.
 
 ## Features
 
 - Allows scaling the tablet work area based on screen resolution
-- Useful for artists, designers, and digital note-takers with multi-monitor or high-DPI setups
 - Clean and responsive UI with real-time feedback
 
 ## Run
