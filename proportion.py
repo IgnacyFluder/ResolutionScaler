@@ -42,9 +42,8 @@ class ResolutionScaler(ThemedTk):
 
         self.PRESET_FILE_PATH = os.path.join(self.ad.get_app_folder(), "presets.json")
         self.title("Resolution Scaler")
-        self.geometry("600x900")
-        self.resizable(False, False)
-        self.minsize(500, 500)
+        self.geometry("600x910")
+        self.minsize(600, 910)
 
         self.style = ttk.Style(self)
         self.style.theme_use(THEME)
@@ -150,7 +149,7 @@ class ResolutionScaler(ThemedTk):
                 self.TABLET_WIDTH_MM = float(width_var.get())
                 self.TABLET_HEIGHT_MM = float(height_var.get())
                 self.TABLET_NAME = name_var.get()
-                self.MONITOR_INDEX = int(monitor_var.get()) + 1
+                self.MONITOR_INDEX = int(monitor_var.get()) - 1
                 self.TARGET_WIDTH, self.TARGET_HEIGHT = utils.get_monitor_resolutions()[self.MONITOR_INDEX]
                 self.TARGET_POS = (self.TARGET_WIDTH // 2, self.TARGET_HEIGHT // 2)
 
