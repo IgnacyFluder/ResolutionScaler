@@ -1,4 +1,4 @@
-# ResolutionScaler
+# ResolutionScaler-clean
 
 **ResolutionScaler** is a utility designed to dynamically scale and align a graphics tablet's working area with your screen resolution. This app integrates with [OpenTabletDriver](https://github.com/OpenTabletDriver/OpenTabletDriver) to detect supported tablets and adjust mappings in real time, allowing for optimal drawing precision and screen-to-tablet ratio consistency across different monitor setups. On this branch the UI is cleaner but requires TTKThemes.
 
@@ -14,7 +14,7 @@ With python:
 pip install -r requirements.txt
 python proportion.py
 ```
-or use the precompiled pyinstaller exe
+or use the precompiled pyinstaller exe from the releases.
 
 ## Supported Tablets
 
