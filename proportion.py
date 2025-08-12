@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog, Menu
+from numpy import var
+from streamlit import form
 from ttkthemes import ThemedTk
 import json
 import os
@@ -7,6 +9,21 @@ import subprocess
 import ctypes
 import utils
 import webbrowser
+import ctypes
+import os
+import re
+
+def hide_console():
+    if os.name == 'nt':
+        hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+        if hwnd:
+            ctypes.windll.user32.ShowWindow(hwnd, 0)  # 0 = SW_HIDE
+
+def show_console():
+    if os.name == 'nt':
+        hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+        if hwnd:
+            ctypes.windll.user32.ShowWindow(hwnd, 5)  # 5 = SW_SHOW
 
 THEME = "yaru"
 utils.set_per_monitor_v2_dpi_awareness()
@@ -39,6 +56,7 @@ class ResolutionScaler(ThemedTk):
         self.TABLET_NAME = "XP-Pen Star G430S"
         self.MONITOR_INDEX = 0
         self.ALIGNMENT = "TOP_LEFT"
+        self.SHOW_CONSOLE = False
 
         self.PRESET_FILE_PATH = os.path.join(self.ad.get_app_folder(), "presets.json")
         self.title("Resolution Scaler")
@@ -52,6 +70,10 @@ class ResolutionScaler(ThemedTk):
         self.configure(bg="#f8f8f8")
 
         self.load_settings()
+        if self.SHOW_CONSOLE:
+            show_console()
+        else:
+            hide_console()
         self.setup_ui()
         self.load_presets()
         self.deiconify()
@@ -67,6 +89,8 @@ class ResolutionScaler(ThemedTk):
                 self.MONITOR_INDEX = settings.get("monitor_index", 0)
                 self.TARGET_WIDTH, self.TARGET_HEIGHT = utils.get_monitor_resolutions()[self.MONITOR_INDEX]
                 self.TARGET_POS = (self.TARGET_WIDTH // 2, self.TARGET_HEIGHT // 2)
+                self.SHOW_CONSOLE = settings.get("show_console", False)
+
             except json.JSONDecodeError:
                 print("settings.json is invalid.")
         else:
@@ -130,19 +154,43 @@ class ResolutionScaler(ThemedTk):
 
         def make_field(label, var, row):
             ttk.Label(form, text=label).grid(row=row, column=0, sticky="w", pady=5)
-            entry = ttk.Entry(form, textvariable=var)
-            entry.grid(row=row, column=1, sticky="ew", pady=5)
-            form.grid_columnconfigure(1, weight=1)
+        
+            if isinstance(var, tk.BooleanVar):
+                widget = ttk.Checkbutton(form, variable=var)
+        
+            elif isinstance(var, tk.IntVar):
+                vcmd = (form.register(lambda val: val == "" or val.isdigit()), "%P")
+                widget = ttk.Entry(form, textvariable=var, validate="key", validatecommand=vcmd)
 
-        width_var = tk.StringVar(value=str(self.TABLET_WIDTH_MM))
-        height_var = tk.StringVar(value=str(self.TABLET_HEIGHT_MM))
+            elif isinstance(var, tk.DoubleVar):
+                float_pattern = re.compile(r"^-?(\d+(\.\d*)?|\.\d*)?$")
+                def validate_float(val):
+                    return val == "" or bool(float_pattern.match(val))
+                vcmd = (form.register(validate_float), "%P")
+                widget = ttk.Entry(form, textvariable=var, validate="key", validatecommand=vcmd)
+
+        
+            elif isinstance(var, tk.StringVar):
+                widget = ttk.Entry(form, textvariable=var)
+        
+            else:
+                raise TypeError(f"Unsupported variable type: {type(var).__name__}")
+            widget.grid(row=row, column=1, sticky="ew", pady=5)
+            form.grid_columnconfigure(1, weight=1)
+            return widget
+
+
+        width_var = tk.StringVar(value=float(self.TABLET_WIDTH_MM))
+        height_var = tk.StringVar(value=float(self.TABLET_HEIGHT_MM))
         name_var = tk.StringVar(value=self.TABLET_NAME)
-        monitor_var = tk.StringVar(value=str(self.MONITOR_INDEX + 1))
+        monitor_var = tk.IntVar(value=self.MONITOR_INDEX + 1)
+        show_console_var = tk.BooleanVar(value=self.SHOW_CONSOLE)
 
         make_field("Tablet Width (mm):", width_var, 0)
         make_field("Tablet Height (mm):", height_var, 1)
         make_field("Tablet Name:", name_var, 2)
         make_field("Monitor Number:", monitor_var, 3)
+        make_field("Show console:", show_console_var, 4)
 
         def save():
             try:
@@ -152,20 +200,28 @@ class ResolutionScaler(ThemedTk):
                 self.MONITOR_INDEX = int(monitor_var.get()) - 1
                 self.TARGET_WIDTH, self.TARGET_HEIGHT = utils.get_monitor_resolutions()[self.MONITOR_INDEX]
                 self.TARGET_POS = (self.TARGET_WIDTH // 2, self.TARGET_HEIGHT // 2)
+                self.SHOW_CONSOLE = show_console_var.get()
+
 
                 self.ad.write_file("settings.json", json.dumps({
                     "t_width_mm": self.TABLET_WIDTH_MM,
                     "t_height_mm": self.TABLET_HEIGHT_MM,
                     "tablet_name": self.TABLET_NAME,
-                    "monitor_index": self.MONITOR_INDEX
+                    "monitor_index": self.MONITOR_INDEX,
+                    "show_console": show_console_var.get()
                 }, indent=2))
+
+                if show_console_var.get():
+                    show_console()
+                else:
+                    hide_console()
 
                 messagebox.showinfo("Saved", "Settings updated successfully.")
                 settings_win.destroy()
             except Exception as e:
                 messagebox.showerror("Error", f"Could not save settings:\n{e}")
 
-        ttk.Button(form, text="Save", command=save).grid(row=4, column=0, columnspan=2, pady=10)
+        ttk.Button(form, text="Save", command=save).grid(row=5, column=0, columnspan=2, pady=10)
 
 
     def create_menu(self):
